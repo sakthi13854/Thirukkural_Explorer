@@ -1,0 +1,14 @@
+# Devpost Learn — keep personal learning context out of commits
+/devpost/learner-profile.md
+
+# Ignore local credential files but allow a secret-free example
+.env
+.env.*
+!.env.example
+
+# Python caches & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/

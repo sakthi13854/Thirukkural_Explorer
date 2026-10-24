@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thirukural Explainer</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #FAF6EE;
+            color: #3D2314;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .header { text-align: center; margin-bottom: 30px; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; padding: 12px; font-size: 16px; border: 1px solid #7A4B29; border-radius: 6px; }
+        button { padding: 12px 20px; background: #7A4B29; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .card { background: white; border: 1px solid #D4B996; border-radius: 8px; padding: 20px; margin-top: 20px; }
+        .kural-ta { font-size: 20px; font-weight: bold; margin-bottom: 12px; color: #3D2314; }
+        .trans { font-style: italic; color: #4A3525; white-space: pre-line; line-height: 1.5; }
+        .meta { font-size: 14px; color: #7A4B29; margin-top: 10px; }
+        .fallback-item { margin-top: 8px; padding: 8px; background: #F3EBDD; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Thirukural Explainer — API Verification</h1>
+        <p>Search by number (1-1330), starting words, or Athigaram number (e.g. 'adhigaram 2')</p>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="query" placeholder="Enter kural number (e.g. 1) or text..." value="1">
+        <button onclick="doSearch()">Search</button>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+        async function doSearch() {
+            const q = document.getElementById('query').value.trim();
+            const resDiv = document.getElementById('result');
+            resDiv.innerHTML = '<p>Loading...</p>';
+
+            try {
+                const res = await fetch(`/api/kural/search?q=${encodeURIComponent(q)}`);
+                const data = await res.json();
+
+                if (data.found && data.kural) {
+                    const k = data.kural;
+                    resDiv.innerHTML = `
+                        <div class="card">
+                            <div class="meta">Kural #${k.number} · ${k.adhigaram_name} (${k.adhigaram_name_en}) · ${k.paal}</div>
+                            <div class="kural-ta">${k.line1}<br>${k.line2}</div>
+                            <div class="trans"><strong>G.U. Pope Translation:</strong><br>${k.translation}</div>
+                            <div class="meta" style="margin-top: 15px;"><strong>Tamil Meaning:</strong> ${k.explanation_ta}</div>
+                        </div>
+                    `;
+                } else {
+                    let fallbacksHtml = '';
+                    if (data.fallback_kurals) {
+                        fallbacksHtml = data.fallback_kurals.map(k => `
+                            <div class="fallback-item" onclick="loadKural(${k.number})">
+                                <strong>#${k.number}:</strong> ${k.line1} (${k.adhigaram_name})
+                            </div>
+                        `).join('');
+                    }
+                    resDiv.innerHTML = `
+                        <div class="card">
+                            <p style="color: #9C3325;">${data.message || 'No kural found.'}</p>
+                            ${fallbacksHtml ? '<h4 style="margin-top:15px;">Explore these famous kurals:</h4>' + fallbacksHtml : ''}
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                resDiv.innerHTML = `<div class="card"><p style="color:red;">Error: ${err.message}</p></div>`;
+            }
+        }
+
+        function loadKural(num) {
+            document.getElementById('query').value = num;
+            doSearch();
+        }
+
+        // Run search on load
+        window.onload = doSearch;
+    </script>
+</body>
+</html>
