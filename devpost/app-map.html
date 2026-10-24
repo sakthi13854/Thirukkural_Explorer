@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thirukural Explainer — App Map & Architecture Guide</title>
+    <style>
+        :root {
+            --bg-page: #FAF6EE;
+            --card-bg: #FFFFFF;
+            --primary: #3D2314;
+            --accent: #7A4B29;
+            --gold: #C28D3F;
+            --border: #DCD0C0;
+            --text-dark: #2A170C;
+            --text-muted: #6B4E38;
+            --code-bg: #F4ECE0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 32px 20px;
+        }
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+        header {
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border);
+        }
+        h1 {
+            color: var(--primary);
+            font-size: 1.85rem;
+            margin-bottom: 6px;
+        }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 14px rgba(45, 25, 13, 0.05);
+        }
+        h2 {
+            color: var(--primary);
+            font-size: 1.25rem;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .diagram-container {
+            background: #2A170C;
+            color: #FFF6EC;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 16px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .stop {
+            margin-bottom: 16px;
+            padding-left: 14px;
+            border-left: 3px solid var(--accent);
+        }
+        .stop-title {
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+        .code-ref {
+            font-family: monospace;
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.88rem;
+        }
+        ul { padding-left: 20px; margin-top: 8px; }
+        li { margin-bottom: 8px; }
+        .practice-box {
+            background: #FDF9F2;
+            border-left: 4px solid var(--gold);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 12px;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 36px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Thirukural Explainer — App Map & Architecture Guide</h1>
+            <p class="subtitle">A permanent reference map for understanding how the backend, data, and AI layers connect.</p>
+        </header>
+
+        <!-- Overview -->
+        <div class="card">
+            <h2><span>🧭</span> App Purpose and Structure</h2>
+            <p>
+                The Thirukural Explainer is a single-environment Python web application built with FastAPI. It loads 1,330 Thirukkural verses into memory alongside historical G.U. Pope translations (1886) and uses Google Gemini 2.5 Flash to generate real-world short stories that illustrate the moral wisdom of each couplet.
+            </p>
+        </div>
+
+        <!-- System Flow Diagram -->
+        <div class="card">
+            <h2><span>🔄</span> Core Data Flow: Requesting a Verse & Story</h2>
+            <p>Here is what happens when someone searches for a kural and clicks "Generate Story Illustration":</p>
+            <div class="diagram-container">
+[ User Browser ]
+       │
+       ▼ 1. Clicks "Generate Story Illustration"
+[ app/static/app.js: triggerStoryGeneration(1) ]
+       │
+       ├── Activates Trivia Loading Overlay (cycles cultural facts)
+       │
+       ▼ 2. HTTP GET /api/kural/1/story?lang=en
+[ app/main.py: @app.get("/api/kural/{number}/story") ]
+       │
+       ▼ 3. Checks In-Memory Cache Dictionary
+[ app/ai.py: STORY_CACHE.get("1_en") ]
+       │
+       ├── Cache Hit? ──▶ Returns story in &lt;1ms (source: "in-memory-cache")
+       │
+       └── Cache Miss?
+             │
+             ├── Formats structured bilingual prompt with G.U. Pope text
+             ├── Calls Google Gemini API (gemini-2.5-flash)
+             ├── Saves result into STORY_CACHE["1_en"]
+             └── Returns JSON { kural_number: 1, story: "...", cached: false }
+       │
+       ▼ 4. DOM Update
+[ app/static/app.js ] ──▶ Hides Trivia Overlay ──▶ Renders Story in Vertical Stack
+            </div>
+        </div>
+
+        <!-- Code Tour Stops -->
+        <div class="card">
+            <h2><span>🗺️</span> 3 Core Code Locations</h2>
+            
+            <div class="stop">
+                <div class="stop-title">Stop 1: FastAPI Application Router</div>
+                <p>File: <span class="code-ref">app/main.py</span></p>
+                <p>Contains endpoint routing for verse search, lookup, and story generation. Notice how specific endpoints like <span class="code-ref">/api/kural/search</span> are registered before parameterized routes like <span class="code-ref">/api/kural/{number}</span> so strings aren't parsed as integer paths.</p>
+            </div>
+
+            <div class="stop">
+                <div class="stop-title">Stop 2: AI Prompt Engine & In-Memory Cache</div>
+                <p>File: <span class="code-ref">app/ai.py</span></p>
+                <p>Implements <span class="code-ref">generate_kural_story()</span> and <span class="code-ref">STORY_CACHE</span>. It injects the verse's Tamil text and G.U. Pope commentary into a contextual prompt template and caches results per session.</p>
+            </div>
+
+            <div class="stop">
+                <div class="stop-title">Stop 3: Frontend Vertical Stack Controller</div>
+                <p>File: <span class="code-ref">app/static/app.js</span></p>
+                <p>Controls language switching (English/Tamil), search execution, sequential next-kural navigation, and manages the cultural "Did you know?" trivia overlay during generation latency.</p>
+            </div>
+        </div>
+
+        <!-- To Change This, Start Here -->
+        <div class="card">
+            <h2><span>🛠️</span> To Change This, Start Here</h2>
+            <ul>
+                <li><strong>To customize the AI story prompt:</strong> Open <span class="code-ref">app/ai.py</span> and edit <span class="code-ref">craft_prompt()</span> to adjust the story length, tone, or setting.</li>
+                <li><strong>To add or edit "Did you know?" trivia facts:</strong> Open <span class="code-ref">app/trivia.py</span> and append new items to <span class="code-ref">TRIVIA_FACTS</span>.</li>
+                <li><strong>To adjust the oil-paint colors or glassmorphism blur:</strong> Open <span class="code-ref">app/static/style.css</span> and tweak CSS custom properties under <span class="code-ref">:root</span>.</li>
+                <li><strong>To change the fallback famous kurals:</strong> Open <span class="code-ref">app/data.py</span> and edit <span class="code-ref">FAMOUS_KURAL_NUMBERS</span>.</li>
+            </ul>
+        </div>
+
+        <!-- A Practice to Reuse -->
+        <div class="card">
+            <h2><span>💡</span> A Practice to Reuse</h2>
+            <div class="practice-box">
+                <p><strong>1. Strict Route Ordering in Backend Frameworks:</strong> In FastAPI, routes evaluate in the order they are defined. Always register literal endpoints (<span class="code-ref">/search</span>, <span class="code-ref">/famous</span>) before dynamic wildcard paths (<span class="code-ref">/{number}</span>) to prevent type validation conflicts.</p>
+                <p style="margin-top: 8px;"><strong>2. Engaging Latency Transformation:</strong> Instead of showing a blank, boring loading spinner during LLM inference, presenting lightweight cultural trivia ("Did you know?" facts) turns latency into an enriching user experience.</p>
+            </div>
+        </div>
+
+        <!-- Startup Command -->
+        <div class="card">
+            <h2><span>▶️</span> How to Run the App</h2>
+            <p>Start the server from your terminal anytime with:</p>
+            <div class="diagram-container" style="padding: 12px;">uvicorn app.main:app --reload --port 8000</div>
+            <p>Open <a href="http://localhost:8000" target="_blank" style="color: var(--accent); font-weight: 600;">http://localhost:8000</a> in your browser.</p>
+        </div>
+
+        <footer>
+            <p>Thirukural Explainer · Devpost Learn Architecture Map · All 1,330 Verses Loaded</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -29,7 +29,7 @@ Build mode: fast
   Learner check: Open `http://localhost:8000`, experience the oil-paint home screen, search for a kural or click next, and see the verse rendered in its distinct classical font followed by G.U. Pope's translation in a vertical stack.
   Commit: `Add oil-paint glassmorphism UI and vertical stack verse surface`
 
-- [ ] **3. Gemini AI short-story generation, in-memory caching, and trivia loading screen**
+- [x] **3. Gemini AI short-story generation, in-memory caching, and trivia loading screen**
   Becomes usable: The complete unique kernel—viewing any kural triggers an engaging "Did you know?" trivia loading screen while Gemini generates a contextual short story in the selected language, which renders at the bottom of the stack and is cached for instant replay.
   Why now: Completes the central differentiator of the app by connecting the Gemini AI service, in-memory caching, and cultural loading screen to the live UI.
   PRD ref: `prd.md > AI Short-Story Generation with Trivia Loading`, `prd.md > States and Boundaries`
@@ -41,23 +41,23 @@ Build mode: fast
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — Slice 1 (API and preloaded dataset verified via `/docs` and browser)
-- [ ] Final kick-the-tires exploration and feedback completed — Slice 3 (Complete app tested: search, trivia, stories, language toggle)
+- [x] Early usable behavior explored — Slice 1 (API and preloaded dataset verified via `/docs` and browser)
+- [x] Final kick-the-tires exploration and feedback completed — Slice 3 (Complete app tested: search, trivia, stories, language toggle)
 
 ## Final Review
 
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- [x] Final review complete — feedback resolved and learner confirms ready to ship
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
+- [x] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: 
-Route and stops: 
-Edit outcome: 
-Reflection: 
-Activity mode: 
+Activity and evidence: Connected learner goal (backend frameworks & AI stacks) to actual route ordering discovery in app/main.py, in-memory caching in app/ai.py, and Gemini prompt crafting.
+Route and stops: Stop 1: app/main.py (@app.get routes), Stop 2: app/ai.py (generate_kural_story & STORY_CACHE), Stop 3: app/static/app.js (triggerStoryGeneration & DOM updates).
+Edit outcome: Not applicable; learner confirmed PoC is complete and ready.
+Reflection: Already addressed during spec and build discussions.
+Activity mode: focused alternative and app-map reference.
 
 ## Revisions
