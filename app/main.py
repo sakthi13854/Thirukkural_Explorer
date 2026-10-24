@@ -5,6 +5,8 @@ from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 
 from app.data import get_kural_by_number, search_kurals, get_random_famous_kurals, Kural, SearchResponse
+from app.ai import generate_kural_story, StoryResponse
+from app.trivia import get_all_trivia
 
 load_dotenv()
 
@@ -31,6 +33,19 @@ async def serve_index():
 async def search(q: str = Query(..., description="Kural number, starting words, or Athigaram (e.g. '1', 'அகர', 'adhigaram 5')")):
     return search_kurals(q)
 
+@app.get("/api/kural/{number}/story", response_model=StoryResponse, summary="Get AI-generated short story explanation for a kural")
+async def get_story(
+    number: int,
+    lang: str = Query("en", regex="^(en|ta)$", description="Language preference ('en' or 'ta')")
+):
+    if number < 1 or number > 1330:
+        raise HTTPException(status_code=404, detail="Kural number must be between 1 and 1330.")
+    kural = get_kural_by_number(number)
+    if not kural:
+        raise HTTPException(status_code=404, detail=f"Kural #{number} not found.")
+    
+    return await generate_kural_story(kural, language=lang)
+
 @app.get("/api/kural/{number}", response_model=Kural, summary="Get Kural by number (1-1330)")
 async def get_kural(number: int):
     if number < 1 or number > 1330:
@@ -43,6 +58,10 @@ async def get_kural(number: int):
 @app.get("/api/famous", response_model=list[Kural], summary="Get random famous kurals for exploration")
 async def famous_kurals(count: int = Query(5, ge=1, le=10)):
     return get_random_famous_kurals(count)
+
+@app.get("/api/trivia", summary="Get curated Thirukkural and Thiruvalluvar cultural trivia")
+async def trivia_facts():
+    return get_all_trivia()
 
 @app.get("/api/health", summary="Health check")
 async def health():

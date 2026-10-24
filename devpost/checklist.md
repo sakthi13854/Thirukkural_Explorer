@@ -19,7 +19,7 @@ Build mode: fast
   Learner check: Open `http://localhost:8000/docs` in your browser, click "Try it out" on `/api/kural/{number}`, enter `1`, and see Kural 1's Tamil text and G.U. Pope translation returned live.
   Commit: `Scaffold project, preloaded dataset, and FastAPI search endpoints`
 
-- [ ] **2. Oil-paint visual identity, glassmorphism UI, and vertical stack verse surface**
+- [x] **2. Oil-paint visual identity, glassmorphism UI, and vertical stack verse surface**
   Becomes usable: A fully styled web application with the warm brown oil-paint village hero, interactive search bar, language toggle (Tamil/English), sequential "Next Kural" navigation, and the vertical stack verse layout (Kural in distinct font followed by G.U. Pope explanation).
   Why now: Establishes the real user-facing UI and navigation loop so the AI story and loading screen can slot directly into the exact layout defined by the PRD.
   PRD ref: `prd.md > Screens and Layout`, `prd.md > Look and Feel`, `prd.md > Sequential Navigation & Fallbacks`

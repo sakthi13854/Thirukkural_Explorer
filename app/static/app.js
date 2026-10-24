@@ -1,7 +1,10 @@
-// Thirukural Explainer — Frontend Controller (Slice 2)
+// Thirukural Explainer — Frontend Controller (Slice 3 Complete)
 
 let currentLanguage = sessionStorage.getItem('thirukural_lang') || 'en';
 let currentKural = null;
+let triviaList = [];
+let triviaInterval = null;
+let currentTriviaIndex = 0;
 
 // UI Translations Dictionary
 const I18N = {
@@ -18,13 +21,19 @@ const I18N = {
         popeHeading: "G.U. Pope Translation (1886)",
         taHeading: "Tamil Commentary",
         storyHeading: "AI Short-Story Illustration",
-        storyPlaceholder: "Select 'Read Story' to generate a contextual real-world narrative for this verse.",
-        readStoryBtn: "Generate AI Story",
+        readStoryBtn: "Generate Story Illustration",
+        storyPlaceholder: "Click below to weave a contemporary short-story that illustrates the moral of this kural.",
         prevBtn: "← Previous",
         nextBtn: "Next Kural →",
         backSearch: "🔍 Home & Search",
         noMatchTitle: "No exact verse found",
-        exploreFamous: "Explore these celebrated kurals instead:"
+        exploreFamous: "Explore these celebrated kurals instead:",
+        triviaTitle: "Did You Know?",
+        triviaSub: "Weaving an illustrative story with Gemini AI...",
+        cachedBadge: "⚡ In-Session Memory",
+        geminiBadge: "Gemini 2.5 Flash",
+        retryBtn: "Retry Generation",
+        errorStory: "The storyteller encountered a temporary delay. Please click retry."
     },
     ta: {
         appTitle: "திருக்குறள் விளக்கம்",
@@ -39,19 +48,26 @@ const I18N = {
         popeHeading: "ஜி.யு. போப் ஆங்கில மொழிபெயர்ப்பு (1886)",
         taHeading: "தமிழ் உரை விளக்கம்",
         storyHeading: "செயற்கை நுண்ணறிவு சிறுகதை விளக்கம்",
-        storyPlaceholder: "இக்குறளின் வாழ்வியல் கருத்தை விளக்கும் சிறுகதையைப் படிக்க கீழே உள்ள பொத்தானை அழுத்தவும்.",
-        readStoryBtn: "கதை விளக்கம் பெறுக",
+        readStoryBtn: "கதை விளக்கம் உருவாக்குக",
+        storyPlaceholder: "இக்குறளின் வாழ்வியல் கருத்தை விளக்கும் எளிய வாழ்வியல் சிறுகதையைப் படிக்க கீழே அழுத்தவும்.",
         prevBtn: "← முந்தைய குறள்",
         nextBtn: "அடுத்த குறள் →",
         backSearch: "🔍 முகப்பு / தேடல்",
         noMatchTitle: "குறள் எதுவும் கிடைக்கவில்லை",
-        exploreFamous: "புகழ்பெற்ற இந்த அருங்குறள்களைக் காண்க:"
+        exploreFamous: "புகழ்பெற்ற இந்த அருங்குறள்களைக் காண்க:",
+        triviaTitle: "உங்களுக்குத் தெரியுமா?",
+        triviaSub: "ஜெமினி செயற்கை நுண்ணறிவால் கதை விளக்கம் தயாராகிறது...",
+        cachedBadge: "⚡ நினைவகப் பதிவு",
+        geminiBadge: "ஜெமினி 2.5 ஃப்ளாஷ்",
+        retryBtn: "மீண்டும் முயற்சிக்க",
+        errorStory: "கதை உருவாக்கத்தில் தற்காலிக தாமதம் ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்."
     }
 };
 
 // Initialize Application
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     updateLanguageUI();
+    loadTriviaFacts();
     
     // Check if URL has a specific kural hash, e.g., #1 or #391
     const hash = window.location.hash.replace('#', '');
@@ -70,6 +86,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+async function loadTriviaFacts() {
+    try {
+        const res = await fetch('/api/trivia');
+        if (res.ok) {
+            triviaList = await res.json();
+        }
+    } catch (e) {
+        console.warn("Could not preload trivia facts:", e);
+    }
+}
+
 function setLanguage(lang) {
     currentLanguage = lang;
     sessionStorage.setItem('thirukural_lang', lang);
@@ -85,7 +112,6 @@ function updateLanguageUI() {
         btn.classList.toggle('active', btn.dataset.lang === currentLanguage);
     });
 
-    // Update static labels if elements exist
     setElementText('uiAppTitle', t.appTitle);
     setElementText('uiAppSubtitle', t.appSubtitle);
     setElementText('uiHeroTag', t.heroTag);
@@ -93,6 +119,8 @@ function updateLanguageUI() {
     setElementText('uiHeroSub', t.heroSub);
     setElementText('uiQuickLabel', t.quickPicks);
     setElementText('uiSearchBtn', t.searchBtn);
+    setElementText('uiTriviaTitle', t.triviaTitle);
+    setElementText('uiTriviaSub', t.triviaSub);
     
     const searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.placeholder = t.searchPlaceholder;
@@ -176,13 +204,16 @@ function renderVerse(kural) {
     const meaningTaEl = document.getElementById('tamilExplanation');
     if (meaningTaEl) meaningTaEl.textContent = kural.explanation_ta || '';
 
-    // Stack Card 3: AI Story (Ready for Slice 3)
+    // Stack Card 3: AI Story Trigger / Content
     setElementText('headingStory', t.storyHeading);
+    const storyBadge = document.querySelector('.story-badge');
+    if (storyBadge) storyBadge.textContent = t.geminiBadge;
+
     const storyBody = document.getElementById('storyBody');
     if (storyBody) {
         storyBody.innerHTML = `
-            <div style="text-align: center; padding: 18px 0; color: var(--text-muted);">
-                <p style="margin-bottom: 12px; font-style: italic;">${t.storyPlaceholder}</p>
+            <div style="text-align: center; padding: 20px 0; color: var(--text-secondary);">
+                <p style="margin-bottom: 14px; font-style: italic;">${t.storyPlaceholder}</p>
                 <button class="btn-primary-action" id="triggerStoryBtn" onclick="triggerStoryGeneration(${kural.number})">
                     <span>✨</span> <span>${t.readStoryBtn}</span>
                 </button>
@@ -190,13 +221,82 @@ function renderVerse(kural) {
         `;
     }
 
-    // Update bottom nav buttons
+    // Bottom navigation buttons
     setElementText('btnPrev', t.prevBtn);
     setElementText('btnNext', t.nextBtn);
     setElementText('btnBackSearch', t.backSearch);
+}
 
-    // Scroll to verse smoothly if user searched
-    verseSurface.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+// Slice 3: Trigger AI Short-Story with Trivia Overlay
+async function triggerStoryGeneration(kuralNumber) {
+    const t = I18N[currentLanguage];
+    const overlay = document.getElementById('triviaOverlay');
+    const factBox = document.getElementById('triviaFactBox');
+    const storyBody = document.getElementById('storyBody');
+    const storyBadge = document.querySelector('.story-badge');
+
+    // Show trivia overlay & cycle facts
+    if (overlay) {
+        overlay.style.display = 'flex';
+        showNextTriviaFact();
+        if (triviaInterval) clearInterval(triviaInterval);
+        triviaInterval = setInterval(showNextTriviaFact, 3500);
+    }
+
+    try {
+        const res = await fetch(`/api/kural/${kuralNumber}/story?lang=${currentLanguage}`);
+        if (!res.ok) throw new Error("Could not fetch story");
+        const data = await res.json();
+
+        // Format paragraphs nicely
+        const paragraphs = data.story
+            .split('\n\n')
+            .filter(p => p.trim() !== '')
+            .map(p => `<p>${p.trim()}</p>`)
+            .join('');
+
+        if (storyBody) {
+            storyBody.innerHTML = paragraphs;
+        }
+
+        if (storyBadge) {
+            storyBadge.textContent = data.cached ? t.cachedBadge : t.geminiBadge;
+            if (data.cached) {
+                storyBadge.style.background = 'linear-gradient(135deg, #2D6A4F, #1B4332)';
+            } else {
+                storyBadge.style.background = 'linear-gradient(135deg, var(--warm-sepia), var(--primary-brown))';
+            }
+        }
+    } catch (err) {
+        console.error("Story generation error:", err);
+        if (storyBody) {
+            storyBody.innerHTML = `
+                <div style="text-align: center; padding: 16px; color: #9C3325;">
+                    <p>${t.errorStory}</p>
+                    <button class="nav-link-btn" style="margin-top: 10px;" onclick="triggerStoryGeneration(${kuralNumber})">${t.retryBtn}</button>
+                </div>
+            `;
+        }
+    } finally {
+        if (triviaInterval) clearInterval(triviaInterval);
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+    }
+}
+
+function showNextTriviaFact() {
+    const factBox = document.getElementById('triviaFactBox');
+    if (!factBox || !triviaList || triviaList.length === 0) return;
+
+    factBox.style.opacity = '0';
+    setTimeout(() => {
+        const item = triviaList[currentTriviaIndex];
+        const text = item[currentLanguage] || item['en'];
+        factBox.textContent = text;
+        factBox.style.opacity = '1';
+        currentTriviaIndex = (currentTriviaIndex + 1) % triviaList.length;
+    }, 200);
 }
 
 // Render Fallback Discovery on Search Miss
@@ -248,9 +348,4 @@ function navigatePrev() {
 function scrollToSearch() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById('searchInput').focus();
-}
-
-// Placeholder for Slice 3 AI Story trigger
-function triggerStoryGeneration(number) {
-    alert("AI Short-Story generation with trivia loading is arriving in Slice 3!");
 }
