@@ -1,0 +1,217 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="100%" height="100%">
+  <defs>
+    <!-- Oil Paint Texture Filters -->
+    <filter id="oilPaintFilter" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+      <feGaussianBlur in="displaced" stdDeviation="0.4" result="smooth" />
+      <feColorMatrix type="matrix" values="
+        1.05 0 0 0 0.02
+        0 1.02 0 0 0.01
+        0 0 0.95 0 0.00
+        0 0 0 1.0 0" result="warmth" />
+      <feBlend in="SourceGraphic" in2="warmth" mode="multiply" />
+    </filter>
+
+    <radialGradient id="sunGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#FFE6A3" stop-opacity="0.9" />
+      <stop offset="35%" stop-color="#E29B43" stop-opacity="0.7" />
+      <stop offset="70%" stop-color="#8F481B" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#3D2010" stop-opacity="0.95" />
+    </radialGradient>
+
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#542B14" />
+      <stop offset="40%" stop-color="#8E481D" />
+      <stop offset="70%" stop-color="#D78E3C" />
+      <stop offset="100%" stop-color="#F3C377" />
+    </linearGradient>
+
+    <linearGradient id="groundGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6B3A1A" />
+      <stop offset="30%" stop-color="#4A2610" />
+      <stop offset="100%" stop-color="#241208" />
+    </linearGradient>
+
+    <linearGradient id="treeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2E170A" />
+      <stop offset="60%" stop-color="#3F200E" />
+      <stop offset="100%" stop-color="#1A0D06" />
+    </linearGradient>
+
+    <linearGradient id="valluvarRobe" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF5E0" />
+      <stop offset="50%" stop-color="#EAD1A6" />
+      <stop offset="100%" stop-color="#C29864" />
+    </linearGradient>
+  </defs>
+
+  <!-- Sky Canvas -->
+  <rect width="1200" height="600" fill="url(#skyGrad)" filter="url(#oilPaintFilter)" />
+  <circle cx="580" cy="220" r="280" fill="url(#sunGlow)" filter="url(#oilPaintFilter)" />
+
+  <!-- Distant Blue/Brown Mountains -->
+  <path d="M0 380 Q 200 320, 380 350 T 800 330 Q 1020 300, 1200 370 L 1200 600 L 0 600 Z" fill="#5A3119" opacity="0.6" filter="url(#oilPaintFilter)" />
+  <path d="M0 400 Q 280 350, 520 380 T 1000 360 Q 1120 340, 1200 390 L 1200 600 L 0 600 Z" fill="#462412" opacity="0.8" filter="url(#oilPaintFilter)" />
+
+  <!-- Village Thatched Huts in the Background -->
+  <g opacity="0.75" filter="url(#oilPaintFilter)">
+    <!-- Left Hut -->
+    <polygon points="120,410 180,360 240,410" fill="#753D1C" />
+    <rect x="135" y="410" width="90" height="50" fill="#522A12" />
+    <rect x="170" y="425" width="20" height="35" fill="#2E1609" />
+
+    <!-- Right Hut -->
+    <polygon points="980,400 1050,350 1120,400" fill="#753D1C" />
+    <rect x="995" y="400" width="110" height="55" fill="#522A12" />
+    <rect x="1035" y="420" width="25" height="35" fill="#2E1609" />
+  </g>
+
+  <!-- The Great Sacred Banyan Tree (Spread Across Center & Top) -->
+  <g filter="url(#oilPaintFilter)">
+    <!-- Canopy Foliage Masses (Oil Texture Clumps) -->
+    <ellipse cx="600" cy="120" rx="360" ry="90" fill="#221107" opacity="0.95" />
+    <ellipse cx="480" cy="90" rx="280" ry="80" fill="#301A0B" opacity="0.9" />
+    <ellipse cx="720" cy="95" rx="300" ry="85" fill="#361E0E" opacity="0.85" />
+    <ellipse cx="360" cy="140" rx="200" ry="70" fill="#261408" opacity="0.95" />
+    <ellipse cx="850" cy="130" rx="220" ry="75" fill="#2A170A" opacity="0.95" />
+    <ellipse cx="600" cy="70" rx="250" ry="60" fill="#422511" opacity="0.7" />
+
+    <!-- Trunk and Hanging Aerial Roots -->
+    <!-- Main Left Trunk -->
+    <path d="M 520 200 Q 540 320 480 460 L 530 465 Q 570 340 550 200 Z" fill="url(#treeGrad)" />
+    <!-- Main Right Trunk -->
+    <path d="M 640 190 Q 620 310 680 460 L 630 465 Q 590 330 610 190 Z" fill="url(#treeGrad)" />
+    <!-- Aerial Roots Hanging -->
+    <path d="M 400 160 Q 420 300 410 460" stroke="#2B160B" stroke-width="8" stroke-linecap="round" fill="none" />
+    <path d="M 440 180 Q 450 320 445 460" stroke="#381D0E" stroke-width="6" stroke-linecap="round" fill="none" />
+    <path d="M 760 170 Q 750 310 755 460" stroke="#2B160B" stroke-width="7" stroke-linecap="round" fill="none" />
+    <path d="M 800 180 Q 790 320 795 460" stroke="#361D0F" stroke-width="5" stroke-linecap="round" fill="none" />
+  </g>
+
+  <!-- Village Ground Platform -->
+  <path d="M 0 450 Q 300 435 600 440 T 1200 450 L 1200 600 L 0 600 Z" fill="url(#groundGrad)" filter="url(#oilPaintFilter)" />
+
+  <!-- Earthen Stone Dais / Peedam for Thiruvalluvar -->
+  <polygon points="500,470 680,470 710,510 470,510" fill="#58311B" stroke="#7A4525" stroke-width="2" filter="url(#oilPaintFilter)" />
+  <polygon points="470,510 710,510 730,530 450,530" fill="#3D2010" filter="url(#oilPaintFilter)" />
+
+  <!-- ================= THIRUVALLUVAR (Center, Revered) ================= -->
+  <g filter="url(#oilPaintFilter)">
+    <!-- Divine Aura Glow -->
+    <circle cx="590" cy="380" r="70" fill="#FFDA8A" opacity="0.35" />
+
+    <!-- Robes (Flowing Ochre-Cream Silk) -->
+    <!-- Seated Lotus Pose Legs & Draped Robe -->
+    <path d="M 525 470 C 520 440, 560 430, 590 430 C 620 430, 660 440, 655 470 C 630 480, 550 480, 525 470 Z" fill="url(#valluvarRobe)" />
+    <!-- Torso and Upper Robe Draped Over Left Shoulder -->
+    <path d="M 565 375 C 550 400, 545 440, 555 450 C 580 455, 615 455, 630 445 C 635 410, 620 380, 605 375 Z" fill="url(#valluvarRobe)" />
+    <!-- Rudraksha Beads across chest -->
+    <path d="M 570 385 Q 588 410 605 385" stroke="#683416" stroke-width="3" stroke-dasharray="3,3" fill="none" />
+
+    <!-- Head and Beard -->
+    <!-- Head Base -->
+    <circle cx="588" cy="355" r="18" fill="#C98F5E" />
+    <!-- Tied Hair Knot (Kondai) -->
+    <circle cx="586" cy="334" r="11" fill="#241309" />
+    <ellipse cx="588" cy="342" rx="14" ry="8" fill="#241309" />
+    <!-- Holy Ash Marks (Vibhooti) -->
+    <line x1="582" y1="349" x2="596" y2="349" stroke="#FFF5E0" stroke-width="1.5" />
+    <circle cx="589" cy="352" r="1.5" fill="#932517" />
+    <!-- Dignified Flowing White Beard -->
+    <path d="M 578 358 C 576 385, 584 415, 590 422 C 596 415, 604 385, 602 358 Z" fill="#F8F3E8" stroke="#D3C3AC" stroke-width="0.8" />
+    <!-- Face Profile features -->
+    <path d="M 588 358 Q 590 363 591 367" stroke="#A46B3C" stroke-width="1.5" fill="none" />
+
+    <!-- Arms and Hands Holding Palm Leaf (Olaisuvadi) & Stylus (Ezhuthani) -->
+    <!-- Right Arm writing -->
+    <path d="M 605 385 Q 625 405 615 425 L 600 422" fill="#BA8253" />
+    <!-- Left Hand Holding Leaf -->
+    <path d="M 565 390 Q 555 410 568 426 L 585 424" fill="#BA8253" />
+    <!-- The Sacred Palm Leaf Manuscript (Olaisuvadi) -->
+    <rect x="560" y="420" width="55" height="9" rx="2" fill="#E6C887" stroke="#9E763B" stroke-width="1" transform="rotate(-6 585 424)" />
+    <!-- Golden Ezhuthani (Stylus) -->
+    <line x1="608" y1="412" x2="600" y2="424" stroke="#DDA843" stroke-width="2.5" stroke-linecap="round" />
+  </g>
+
+  <!-- ================= VILLAGERS & SCHOLARS (Left & Right Listeners) ================= -->
+  <g filter="url(#oilPaintFilter)">
+    <!-- Left Group: Villagers (Elder, Woman, Youth) -->
+    <!-- Elder with folded hands -->
+    <g transform="translate(360, 420)">
+      <circle cx="30" cy="35" r="14" fill="#A87245" />
+      <path d="M 24 38 C 22 55, 26 70, 31 75 C 36 70, 40 55, 38 38 Z" fill="#E8DEC8" />
+      <!-- White hair -->
+      <circle cx="28" cy="27" r="8" fill="#E8DEC8" />
+      <!-- Folded hands -->
+      <path d="M 18 50 Q 30 55 42 50 Q 30 40 18 50" fill="#915B32" />
+      <!-- Seated body -->
+      <path d="M 0 75 Q 30 65 60 75 L 50 110 L 10 110 Z" fill="#7D4925" />
+    </g>
+
+    <!-- Woman Seated Attentively -->
+    <g transform="translate(430, 440)">
+      <circle cx="25" cy="30" r="13" fill="#B47D4F" />
+      <circle cx="18" cy="28" r="9" fill="#1C0E06" /> <!-- Hair bun -->
+      <!-- Saree Draped in Rust Red/Terracotta -->
+      <path d="M 12 42 C 10 70, 20 90, 40 95 C 50 85, 45 55, 35 42 Z" fill="#963B20" />
+      <path d="M 10 80 Q 30 75 55 80 L 45 105 L 15 105 Z" fill="#7A2D16" />
+    </g>
+
+    <!-- Young Learner Taking Notes -->
+    <g transform="translate(290, 445)">
+      <circle cx="25" cy="30" r="13" fill="#B98254" />
+      <circle cx="23" cy="22" r="8" fill="#1F1007" />
+      <path d="M 15 42 Q 25 40 38 42 L 35 85 L 10 85 Z" fill="#CBB38B" />
+      <!-- Holding palm leaf -->
+      <rect x="25" y="55" width="25" height="6" fill="#DDBB77" stroke="#775522" stroke-width="0.8" />
+    </g>
+
+    <!-- Right Group: Diverse Citizens (Farmer, Merchant, Student) -->
+    <!-- Farmer with headcloth (Thalaipaaga) -->
+    <g transform="translate(730, 420)">
+      <ellipse cx="30" cy="26" rx="14" ry="10" fill="#A85724" /> <!-- Turban -->
+      <circle cx="30" cy="36" r="13" fill="#A46B3C" />
+      <path d="M 18 48 C 16 65, 25 80, 44 80 C 46 65, 40 50, 30 48 Z" fill="#4B2D1B" />
+      <path d="M 5 78 Q 30 70 55 78 L 50 110 L 10 110 Z" fill="#663B20" />
+    </g>
+
+    <!-- Merchant with Pearl Bead Garland -->
+    <g transform="translate(800, 435)">
+      <circle cx="25" cy="30" r="14" fill="#BD8858" />
+      <circle cx="24" cy="21" r="9" fill="#201007" />
+      <path d="M 10 44 Q 25 42 40 44 L 42 90 L 8 90 Z" fill="#93754A" />
+      <path d="M 18 52 Q 25 65 32 52" stroke="#E6C887" stroke-width="2" fill="none" />
+    </g>
+
+    <!-- Attentive Villager Listening -->
+    <g transform="translate(870, 445)">
+      <circle cx="25" cy="30" r="13" fill="#9A6136" />
+      <circle cx="28" cy="23" r="8" fill="#1C0E06" />
+      <path d="M 12 42 Q 25 40 38 42 L 40 85 L 10 85 Z" fill="#6F4225" />
+    </g>
+  </g>
+
+  <!-- Ambient Golden Dust & Light Beams in the Village Clearing -->
+  <g opacity="0.25">
+    <polygon points="560,0 640,0 720,600 480,600" fill="url(#sunGlow)" />
+  </g>
+
+  <!-- Earthen Clay Lamps (Agal Vilakku) on Dais Corners -->
+  <g filter="url(#oilPaintFilter)">
+    <!-- Left Lamp -->
+    <ellipse cx="485" cy="505" rx="9" ry="4" fill="#B4592B" />
+    <circle cx="485" cy="500" r="4" fill="#FFC955" />
+    <circle cx="485" cy="500" r="10" fill="#FFB033" opacity="0.4" />
+
+    <!-- Right Lamp -->
+    <ellipse cx="695" cy="505" rx="9" ry="4" fill="#B4592B" />
+    <circle cx="695" cy="500" r="4" fill="#FFC955" />
+    <circle cx="695" cy="500" r="10" fill="#FFB033" opacity="0.4" />
+  </g>
+
+  <!-- Classical Tamil Script Inscription Watermark at the bottom -->
+  <text x="600" y="580" text-anchor="middle" font-family="'Noto Serif Tamil', serif" font-size="17" fill="#E8CFA6" opacity="0.65" letter-spacing="3">
+    எப்பொருள் யார்யார்வாய்க் கேட்பினும் அப்பொருள் மெய்ப்பொருள் காண்ப தறிவு
+  </text>
+</svg>

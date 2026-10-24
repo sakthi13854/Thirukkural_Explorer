@@ -9,7 +9,7 @@ Build mode: fast
 
 ## Slices
 
-- [ ] **1. Project scaffold, preloaded Thirukkural dataset, and FastAPI search API**
+- [x] **1. Project scaffold, preloaded Thirukkural dataset, and FastAPI search API**
   Becomes usable: A running FastAPI server where you can search or fetch kurals (by number, words, or Athigaram) and receive the Tamil verse and G.U. Pope translation, verified in the browser.
   Why now: Bootstrapping lives in slice one. It proves the local 1,330-kural dataset and FastAPI routing end-to-end so all subsequent slices have a working application and data layer to build on.
   PRD ref: `prd.md > Language Selection & Search`, `prd.md > Verse Presentation & G.U. Pope Translation`

@@ -3,88 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thirukural Explainer</title>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background: #FAF6EE;
-            color: #3D2314;
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-        }
-        .header { text-align: center; margin-bottom: 30px; }
-        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-        input { flex: 1; padding: 12px; font-size: 16px; border: 1px solid #7A4B29; border-radius: 6px; }
-        button { padding: 12px 20px; background: #7A4B29; color: white; border: none; border-radius: 6px; cursor: pointer; }
-        .card { background: white; border: 1px solid #D4B996; border-radius: 8px; padding: 20px; margin-top: 20px; }
-        .kural-ta { font-size: 20px; font-weight: bold; margin-bottom: 12px; color: #3D2314; }
-        .trans { font-style: italic; color: #4A3525; white-space: pre-line; line-height: 1.5; }
-        .meta { font-size: 14px; color: #7A4B29; margin-top: 10px; }
-        .fallback-item { margin-top: 8px; padding: 8px; background: #F3EBDD; border-radius: 4px; cursor: pointer; }
-    </style>
+    <title>Thirukural Explainer — Oil-Paint Edition</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📜</text></svg>">
 </head>
 <body>
-    <div class="header">
-        <h1>Thirukural Explainer — API Verification</h1>
-        <p>Search by number (1-1330), starting words, or Athigaram number (e.g. 'adhigaram 2')</p>
-    </div>
+    <!-- Top Header -->
+    <header>
+        <div class="header-container">
+            <a href="/" class="logo-group">
+                <div class="logo-badge">📜</div>
+                <div class="logo-title">
+                    <h1 id="uiAppTitle">Thirukural Explainer</h1>
+                    <p id="uiAppSubtitle">Timeless Wisdom · Oil-Paint Edition</p>
+                </div>
+            </a>
+            <div class="nav-actions">
+                <div class="lang-toggle">
+                    <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">English</button>
+                    <button class="lang-btn" data-lang="ta" onclick="setLanguage('ta')">தமிழ்</button>
+                </div>
+            </div>
+        </div>
+    </header>
 
-    <div class="search-box">
-        <input type="text" id="query" placeholder="Enter kural number (e.g. 1) or text..." value="1">
-        <button onclick="doSearch()">Search</button>
-    </div>
+    <main>
+        <!-- Hero Section: Oil-Paint Village Painting -->
+        <section class="hero-card">
+            <div class="hero-art-container">
+                <img src="/static/thiruvalluvar_village.svg" alt="Thiruvalluvar teaching villagers under a banyan tree" class="hero-art-image">
+                <div class="hero-art-overlay"></div>
+            </div>
+            <div class="hero-content">
+                <div class="hero-tagline" id="uiHeroTag">Classical Tamil Heritage</div>
+                <h2 class="hero-title" id="uiHeroTitle">Universal Wisdom in Couplets</h2>
+                <p class="hero-subtitle" id="uiHeroSub">
+                    Explore 1,330 verses on virtue, wealth, and love through historical G.U. Pope translations and modern AI storytelling.
+                </p>
+            </div>
+        </section>
 
-    <div id="result"></div>
+        <!-- Search Surface -->
+        <section class="search-container">
+            <div class="search-input-wrapper">
+                <span class="search-icon">🔍</span>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="search-input" 
+                    placeholder="Search by number (1-1330), words (e.g., 'அகர'), or chapter ('adhigaram 5')..."
+                >
+                <button class="search-btn" id="uiSearchBtn" onclick="executeSearch()">Search</button>
+            </div>
+            <div class="search-hints">
+                <span id="uiQuickLabel">Quick Picks:</span>
+                <span class="hint-pill" onclick="loadKuralByNumber(1)">#1 Beginning of Knowledge</span>
+                <span class="hint-pill" onclick="loadKuralByNumber(66)">#66 Sweet Flute & Child</span>
+                <span class="hint-pill" onclick="loadKuralByNumber(78)">#78 The Law of Love</span>
+                <span class="hint-pill" onclick="loadKuralByNumber(102)">#102 Rare Gratitude</span>
+                <span class="hint-pill" onclick="loadKuralByNumber(391)">#391 Flawless Learning</span>
+                <span class="hint-pill" onclick="loadKuralByNumber(1330)">#1330 Final Couplet</span>
+            </div>
+        </section>
 
-    <script>
-        async function doSearch() {
-            const q = document.getElementById('query').value.trim();
-            const resDiv = document.getElementById('result');
-            resDiv.innerHTML = '<p>Loading...</p>';
+        <!-- Search Miss / Fallback View -->
+        <section id="fallbackContainer" class="fallback-container" style="display: none;"></section>
 
-            try {
-                const res = await fetch(`/api/kural/search?q=${encodeURIComponent(q)}`);
-                const data = await res.json();
+        <!-- Verse Reading Surface (Vertical Stack Layout) -->
+        <section id="verseSurface" class="verse-surface">
+            <!-- Nav Bar & Breadcrumbs -->
+            <div class="verse-nav-bar">
+                <div id="verseMetaBadge" class="verse-meta-badge">Virtue · Chapter 1: The Praise of God · Kural #1</div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="nav-link-btn" onclick="navigatePrev()">←</button>
+                    <button class="nav-link-btn" onclick="navigateNext()">→</button>
+                </div>
+            </div>
 
-                if (data.found && data.kural) {
-                    const k = data.kural;
-                    resDiv.innerHTML = `
-                        <div class="card">
-                            <div class="meta">Kural #${k.number} · ${k.adhigaram_name} (${k.adhigaram_name_en}) · ${k.paal}</div>
-                            <div class="kural-ta">${k.line1}<br>${k.line2}</div>
-                            <div class="trans"><strong>G.U. Pope Translation:</strong><br>${k.translation}</div>
-                            <div class="meta" style="margin-top: 15px;"><strong>Tamil Meaning:</strong> ${k.explanation_ta}</div>
-                        </div>
-                    `;
-                } else {
-                    let fallbacksHtml = '';
-                    if (data.fallback_kurals) {
-                        fallbacksHtml = data.fallback_kurals.map(k => `
-                            <div class="fallback-item" onclick="loadKural(${k.number})">
-                                <strong>#${k.number}:</strong> ${k.line1} (${k.adhigaram_name})
-                            </div>
-                        `).join('');
-                    }
-                    resDiv.innerHTML = `
-                        <div class="card">
-                            <p style="color: #9C3325;">${data.message || 'No kural found.'}</p>
-                            ${fallbacksHtml ? '<h4 style="margin-top:15px;">Explore these famous kurals:</h4>' + fallbacksHtml : ''}
-                        </div>
-                    `;
-                }
-            } catch (err) {
-                resDiv.innerHTML = `<div class="card"><p style="color:red;">Error: ${err.message}</p></div>`;
-            }
-        }
+            <!-- Stack Layer 1: The Sacred Kural (Distinct Classical Typography) -->
+            <div class="card-kural">
+                <div class="card-header-label">
+                    <span id="kuralCardLabel">Sacred Couplet #1</span>
+                    <span>🌿</span>
+                </div>
+                <div class="kural-text-classical">
+                    <span id="kuralLine1" class="kural-line">அகர முதல எழுத்தெல்லாம் ஆதி</span>
+                    <span id="kuralLine2" class="kural-line">பகவன் முதற்றே உலகு.</span>
+                </div>
+            </div>
 
-        function loadKural(num) {
-            document.getElementById('query').value = num;
-            doSearch();
-        }
+            <!-- Stack Layer 2: Authoritative Explanations (G.U. Pope & Tamil) -->
+            <div class="card-explanation">
+                <div class="explanation-section">
+                    <div class="explanation-heading">
+                        <span>🇬🇧</span> <span id="headingPope">G.U. Pope Translation (1886)</span>
+                    </div>
+                    <div id="popeCouplet" class="couplet-pope">
+                        A, as its first of letters, every speech maintains; The "Primal Deity" is first through all the world's domains
+                    </div>
+                    <div id="popeMeaning" class="meaning-text">
+                        Meaning: As the letter A is the first of all letters, so the eternal God is first in the world.
+                    </div>
+                </div>
 
-        // Run search on load
-        window.onload = doSearch;
-    </script>
+                <div class="divider"></div>
+
+                <div class="explanation-section">
+                    <div class="explanation-heading">
+                        <span>🇮🇳</span> <span id="headingTamil">Tamil Commentary</span>
+                    </div>
+                    <div id="tamilExplanation" class="meaning-text">
+                        எழுத்துக்கள் எல்லாம் அகரத்தை அடிப்படையாக கொண்டிருக்கின்றன. அதுபோல உலகம் கடவுளை அடிப்படையாக கொண்டிருக்கிறது.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stack Layer 3: AI Story Container (Reserved for Slice 3) -->
+            <div class="card-story">
+                <div class="story-header">
+                    <div class="explanation-heading" style="margin-bottom: 0;">
+                        <span>✨</span> <span id="headingStory">AI Short-Story Illustration</span>
+                    </div>
+                    <span class="story-badge">Gemini 2.5</span>
+                </div>
+                <div id="storyBody" class="story-body">
+                    <!-- Populated by app.js -->
+                </div>
+            </div>
+
+            <!-- Bottom Navigation Bar -->
+            <div class="verse-bottom-nav">
+                <button class="nav-link-btn" id="btnPrev" onclick="navigatePrev()">← Previous</button>
+                <button class="nav-link-btn" id="btnBackSearch" onclick="scrollToSearch()">🔍 Home & Search</button>
+                <button class="btn-primary-action" id="btnNext" onclick="navigateNext()">Next Kural →</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Thirukural Explainer · Designed with an Oil-Paint Aesthetic · G.U. Pope Historical Translation (1886)</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
 </body>
 </html>
